@@ -1,0 +1,46 @@
+# Odysseus, trimmed for Railway.
+#
+# Upstream's own Dockerfile is built for a workstation: it carries
+# build-essential + cmake (so the Cookbook can compile llama.cpp), chromium and
+# nodejs (the Browser MCP server), tmux and openssh-client (background
+# downloads and remote GPU boxes), a Docker client (host-Docker control), and
+# pre-built Real-ESRGAN wheels (GPU image upscaling). None of that can function
+# on Railway, which has no GPU, no host Docker socket and no second machine to
+# ssh into, so all of it is dropped here. That is roughly 3 GB of image and a
+# long build removed without touching a feature a Railway deployer could use.
+#
+# What is kept is everything the hosted workspace actually needs: the app, its
+# Python dependencies, and libmagic for content-based upload sniffing.
+#
+# Upstream publishes to GHCR but leaves the package private, so the source is
+# fetched from a pinned commit on the curated `main` branch instead of `dev`.
+
+FROM python:3.14-slim
+
+ARG ODYSSEUS_REF=cf4e240ad1622da6a904f496b19d656a2b9c6393
+
+# libmagic1 is dlopened by python-magic at import time for MIME sniffing in
+# src/upload_handler.py. Upstream installs the wrapper in the image rather than
+# requirements.txt for the same reason, so it is repeated here.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates \
+      curl \
+      libmagic1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+RUN curl -fsSL "https://codeload.github.com/odysseus-dev/odysseus/tar.gz/${ODYSSEUS_REF}" \
+      | tar -xz --strip-components=1 -C /app
+
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir python-magic==0.4.27
+
+COPY railway_serve.py /app/railway_serve.py
+COPY railway-entrypoint.sh /usr/local/bin/railway-entrypoint.sh
+RUN chmod +x /usr/local/bin/railway-entrypoint.sh \
+    && mkdir -p /app/data /app/logs
+
+EXPOSE 7000
+
+ENTRYPOINT ["/usr/local/bin/railway-entrypoint.sh"]

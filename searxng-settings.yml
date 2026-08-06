@@ -1,0 +1,16 @@
+# Copied verbatim from upstream's config/searxng/settings.yml.
+#
+# The one line that matters is the json format. SearXNG serves HTML only by
+# default, and Odysseus talks to it exclusively over the JSON API, so without
+# this every web search and every Deep Research run comes back as an unparseable
+# HTML page. Upstream bind-mounts this file; Railway cannot mount files, so it
+# is baked into the image and the placeholder secret is substituted at boot.
+use_default_settings: true
+
+server:
+  secret_key: "__SEARXNG_SECRET__"
+
+search:
+  formats:
+    - html
+    - json

@@ -1,0 +1,19 @@
+# SearXNG with the JSON API switched on, for Odysseus.
+#
+# Odysseus reaches SearXNG only through /search?format=json, and SearXNG ships
+# with JSON output disabled. Upstream's compose fixes that by bind-mounting a
+# settings file; Railway has no way to mount a file into a service, so the
+# settings are baked into an image instead. Same tag upstream pins.
+
+FROM searxng/searxng:2026.5.31-7159b8aed
+
+COPY searxng-settings.yml /usr/local/share/odysseus/searxng-settings.yml
+COPY searxng-entrypoint.sh /usr/local/bin/odysseus-searxng-entrypoint.sh
+
+USER root
+RUN chmod +x /usr/local/bin/odysseus-searxng-entrypoint.sh
+USER searxng
+
+EXPOSE 8080
+
+ENTRYPOINT ["/usr/local/bin/odysseus-searxng-entrypoint.sh"]
