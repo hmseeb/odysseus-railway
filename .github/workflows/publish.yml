@@ -5,6 +5,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Pinned tag the template references. Bump on every rebuild:
+# main-<upstream short sha>-r<n> (Odysseus has no upstream releases).
+env:
+  IMAGE_TAG: main-9d0d372-r1
+
 permissions:
   contents: read
   packages: write
@@ -48,6 +53,7 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/odysseus-railway:latest
             ghcr.io/${{ github.repository_owner }}/odysseus-railway:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/odysseus-railway:${{ env.IMAGE_TAG }}
 
   searxng:
     runs-on: ubuntu-latest
@@ -83,6 +89,7 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/odysseus-railway-searxng:latest
             ghcr.io/${{ github.repository_owner }}/odysseus-railway-searxng:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/odysseus-railway-searxng:${{ env.IMAGE_TAG }}
 
 # ponytail: the upstream commit in Dockerfile.odysseus and the SearXNG base tag
 # in Dockerfile.searxng are bumped by hand, same as buzz-railway and

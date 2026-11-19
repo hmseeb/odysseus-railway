@@ -5,7 +5,7 @@
 # settings file; Railway has no way to mount a file into a service, so the
 # settings are baked into an image instead. Same tag upstream pins.
 
-FROM searxng/searxng:2026.5.31-7159b8aed
+FROM searxng/searxng:2026.10.24-ef0ec03da@sha256:7c7cbe509429e82755104b2a95f52085a98633c95d53f44e4e905fa3a59f08c8
 
 COPY searxng-settings.yml /usr/local/share/odysseus/searxng-settings.yml
 COPY searxng-entrypoint.sh /usr/local/bin/odysseus-searxng-entrypoint.sh

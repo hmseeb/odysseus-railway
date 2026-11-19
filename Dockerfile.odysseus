@@ -15,9 +15,9 @@
 # Upstream publishes to GHCR but leaves the package private, so the source is
 # fetched from a pinned commit on the curated `main` branch instead of `dev`.
 
-FROM python:3.14-slim
+FROM python:3.14.9-slim
 
-ARG ODYSSEUS_REF=cf4e240ad1622da6a904f496b19d656a2b9c6393
+ARG ODYSSEUS_REF=9d0d3720f4ca181d87bef94da826d730acc6d483
 
 # libmagic1 is dlopened by python-magic at import time for MIME sniffing in
 # src/upload_handler.py. Upstream installs the wrapper in the image rather than
