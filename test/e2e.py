@@ -87,7 +87,10 @@ else:
         "pinned_models": MODEL, "model_type": "llm"})
     check("add anthropic endpoint", s == 200 and isinstance(ep, dict), ep)
     eid = (ep.get("id") or (ep.get("endpoint") or {}).get("id") or "") if isinstance(ep, dict) else ""
-    s, sess = call("POST", "/api/session", form={"name": "e2e", "endpoint_id": eid, "model": MODEL, "rag": "true"})
+    s, sess = call("POST", "/api/session", form={"name": "e2e", "endpoint_id": eid, "model": MODEL, "rag": "true",
+                                                    # upstream validates Anthropic models against a static
+                                                    # catalog that lags new releases (src/llm_core.py)
+                                                    "skip_validation": "true"})
     check("create session", s == 200 and isinstance(sess, dict), sess)
     sid = (sess.get("id") or sess.get("session_id") or "") if isinstance(sess, dict) else ""
     t = time.time()
